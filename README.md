@@ -34,13 +34,19 @@ Used pandas to_sql function on the DataFrames to load them into the tables creat
 (Remember this is data from January of 2015)
 
 What airline has the most successful, cancelled, and diverted flights?
+
 ![SuccessfulFlights](images/sucAir.png)
+
 ![CancelledFlights](images/canAir.png)
+
 ![DivertedFlights](images/divAir.png)
 
 What's the most common airport to land and which one gets the most diverted flights?
+
 ![TopAirports](images/topAirports.png)
+
 ![divertedAirports](images/divAirport.png)
 
 Which planes gets cancelled the most?
+
 ![UnluckyPlanes](images/Unluck.png)
