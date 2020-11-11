@@ -1,67 +1,125 @@
-﻿-- Exported from QuickDBD: https://www.quickdatabasediagrams.com/
--- Link to schema: https://app.quickdatabasediagrams.com/#/d/g4o5uY
--- NOTE! If you have used non-SQL datatypes in your design, you will have to change these here.
-DROP TABLE IF EXISTS diverted_flights;
-DROP TABLE IF EXISTS cancelled_flights;
-DROP TABLE IF EXISTS airports;
-
-CREATE TABLE airports (
-    "IATA_code" Text   NOT NULL,
-    "name" Text   NOT NULL,
-    "city" Text   NOT NULL,
-    "state" Text   NOT NULL,
-    "lat" float,
-    "long" float,
-    CONSTRAINT pk_airports PRIMARY KEY (
-        "IATA_code"
+CREATE TABLE "airports" (
+    "PK_IATA_code" varchar(255)   NOT NULL,
+    "name" varchar(255)   NOT NULL,
+    "city" varchar(255)   NOT NULL,
+    "state" varchar(255)   NOT NULL,
+    CONSTRAINT "pk_airports" PRIMARY KEY (
+        "PK_IATA_code"
      )
 );
 
-CREATE TABLE cancelled_flights (
-	"index" Integer,
+CREATE TABLE "successful_flights" (
+    "PK_index" Integer   NOT NULL,
     "flight_number" Integer   NOT NULL,
     "year" Integer   NOT NULL,
     "month" Integer   NOT NULL,
     "day" Integer   NOT NULL,
-    "dow" Text   NOT NULL,
-    "airline" Text   NOT NULL,
-    "tail_number" Text,
-    "origin" Text   NOT NULL,
-    "destination" Text   NOT NULL,
-    "departure_time" Integer,
-    "reason" Text   NOT NULL,
-    CONSTRAINT pk_cancelled_flights PRIMARY KEY (
-        "index"
+    "departure_time" Integer   NOT NULL,
+    "tail_number" varchar(255),
+    "FK_dow" Integer   NOT NULL,
+    "FK_origin" varchar(255)   NOT NULL,
+    "FK_destination" varchar(255)   NOT NULL,
+    "FK_airline" varchar(255)   NOT NULL,
+    CONSTRAINT "pk_successful_flights" PRIMARY KEY (
+        "PK_index"
      )
 );
 
-CREATE TABLE diverted_flights (
-	"index" Integer,
+CREATE TABLE "cancelled_flights" (
+    "PK_index" Integer   NOT NULL,
     "flight_number" Integer   NOT NULL,
     "year" Integer   NOT NULL,
     "month" Integer   NOT NULL,
     "day" Integer   NOT NULL,
-    "dow" Text   NOT NULL,
-    "airline" Text   NOT NULL,
-    "tail_number" Text,
-    "origin" Text   NOT NULL,
-    "destination" Text   NOT NULL,
     "departure_time" Integer,
-    "arrival_time" Integer,
-    CONSTRAINT pk_diverted_flights PRIMARY KEY (
-        "index"
+    "tail_number" varchar(255),
+    "FK_dow" Integer   NOT NULL,
+    "FK_origin" varchar(255)   NOT NULL,
+    "FK_destination" varchar(255)   NOT NULL,
+    "FK_airline" varchar(255)   NOT NULL,
+    "FK_cancellation_code" varchar(255)   NOT NULL,
+    CONSTRAINT "pk_cancelled_flights" PRIMARY KEY (
+        "PK_index"
      )
 );
 
-ALTER TABLE cancelled_flights ADD CONSTRAINT fk_cancelled_flights_origin FOREIGN KEY("origin")
-REFERENCES airports ("IATA_code");
+CREATE TABLE "diverted_flights" (
+    "PK_index" Integer   NOT NULL,
+    "flight_number" Integer   NOT NULL,
+    "year" Integer   NOT NULL,
+    "month" Integer   NOT NULL,
+    "day" Integer   NOT NULL,
+    "departure_time" Integer   NOT NULL,
+    "tail_number" varchar(255),
+    "FK_dow" Integer   NOT NULL,
+    "FK_origin" varchar(255)   NOT NULL,
+    "FK_destination" varchar(255)   NOT NULL,
+    "FK_airline" varchar(255)   NOT NULL,
+    CONSTRAINT "pk_diverted_flights" PRIMARY KEY (
+        "PK_index","flight_number"
+     )
+);
 
-ALTER TABLE cancelled_flights ADD CONSTRAINT fk_cancelled_flights_destination FOREIGN KEY("destination")
-REFERENCES airports ("IATA_code");
+CREATE TABLE "airlines" (
+    "PK_IATA_code" Varchar(255)   NOT NULL,
+    "airline_name" varchar(255)   NOT NULL,
+    CONSTRAINT "pk_airlines" PRIMARY KEY (
+        "PK_IATA_code"
+     )
+);
 
-ALTER TABLE diverted_flights ADD CONSTRAINT fk_diverted_flights_origin FOREIGN KEY("origin")
-REFERENCES airports ("IATA_code");
+CREATE TABLE "cancellation_reason" (
+    "PK_cancellation_code" Char   NOT NULL,
+    "cancellation_reason" Varchar(255)   NOT NULL,
+    CONSTRAINT "pk_cancellation_reason" PRIMARY KEY (
+        "PK_cancellation_code"
+     )
+);
 
-ALTER TABLE diverted_flights ADD CONSTRAINT fk_diverted_flights_destination FOREIGN KEY(destination)
-REFERENCES airports ("IATA_code");
+CREATE TABLE "day_of_the_week" (
+    "PK_index" Integer   NOT NULL,
+    "day" varchar(16)   NOT NULL,
+    CONSTRAINT "pk_day_of_the_week" PRIMARY KEY (
+        "PK_index"
+     )
+);
+
+ALTER TABLE "successful_flights" ADD CONSTRAINT "fk_successful_flights_FK_dow" FOREIGN KEY("FK_dow")
+REFERENCES "day_of_the_week" ("PK_index");
+
+ALTER TABLE "successful_flights" ADD CONSTRAINT "fk_successful_flights_FK_origin" FOREIGN KEY("FK_origin")
+REFERENCES "airports" ("PK_IATA_code");
+
+ALTER TABLE "successful_flights" ADD CONSTRAINT "fk_successful_flights_FK_destination" FOREIGN KEY("FK_destination")
+REFERENCES "airports" ("PK_IATA_code");
+
+ALTER TABLE "successful_flights" ADD CONSTRAINT "fk_successful_flights_FK_airline" FOREIGN KEY("FK_airline")
+REFERENCES "airlines" ("PK_IATA_code");
+
+ALTER TABLE "cancelled_flights" ADD CONSTRAINT "fk_cancelled_flights_FK_dow" FOREIGN KEY("FK_dow")
+REFERENCES "day_of_the_week" ("PK_index");
+
+ALTER TABLE "cancelled_flights" ADD CONSTRAINT "fk_cancelled_flights_FK_origin" FOREIGN KEY("FK_origin")
+REFERENCES "airports" ("PK_IATA_code");
+
+ALTER TABLE "cancelled_flights" ADD CONSTRAINT "fk_cancelled_flights_FK_destination" FOREIGN KEY("FK_destination")
+REFERENCES "airports" ("PK_IATA_code");
+
+ALTER TABLE "cancelled_flights" ADD CONSTRAINT "fk_cancelled_flights_FK_airline" FOREIGN KEY("FK_airline")
+REFERENCES "airlines" ("PK_IATA_code");
+
+ALTER TABLE "cancelled_flights" ADD CONSTRAINT "fk_cancelled_flights_FK_cancellation_code" FOREIGN KEY("FK_cancellation_code")
+REFERENCES "cancellation_reason" ("PK_cancellation_code");
+
+ALTER TABLE "diverted_flights" ADD CONSTRAINT "fk_diverted_flights_FK_dow" FOREIGN KEY("FK_dow")
+REFERENCES "day_of_the_week" ("PK_index");
+
+ALTER TABLE "diverted_flights" ADD CONSTRAINT "fk_diverted_flights_FK_origin" FOREIGN KEY("FK_origin")
+REFERENCES "airports" ("PK_IATA_code");
+
+ALTER TABLE "diverted_flights" ADD CONSTRAINT "fk_diverted_flights_FK_destination" FOREIGN KEY("FK_destination")
+REFERENCES "airports" ("PK_IATA_code");
+
+ALTER TABLE "diverted_flights" ADD CONSTRAINT "fk_diverted_flights_FK_airline" FOREIGN KEY("FK_airline")
+REFERENCES "airlines" ("PK_IATA_code");
 
