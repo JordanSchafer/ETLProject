@@ -1,4 +1,4 @@
-# ETLProject
+# Flight Data Exploration
 Practice the ETL process using January 2015 Flight Data
 
 Original Dataset for 2015 US Flight data from: https://www.kaggle.com/usdot/flight-delays
